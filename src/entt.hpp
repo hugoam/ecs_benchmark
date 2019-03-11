@@ -1,4 +1,6 @@
-#include <entt.hpp>
+#include <entt/entt.hpp>
+
+#include <ctime>
 
 template <typename ...Components, typename Func>
 double iterate_view(entt::registry<std::uint64_t> &ecs, int n_iter, Func func) {

@@ -1,12 +1,23 @@
 #include <include/ecs_benchmark.h>
 
+#ifdef _DEBUG
+#define N_ENTITIES (10000)
+
+#define N_ITERATIONS_CREATE (10)
+#define N_ITERATIONS_ADD (10)
+#define N_ITERATIONS (10)
+
+#else
 #define N_ENTITIES (1000000)
+
 #define N_ITERATIONS_CREATE (25)
 #define N_ITERATIONS_ADD (25)
 #define N_ITERATIONS (1000)
+#endif
 
 #define REFLECS
 #define ENTT
+#define TECS
 
 /* -- Components -- */
 
@@ -76,6 +87,9 @@ struct Intelligence {
 #ifdef ENTT
 #include "entt.hpp"
 #endif
+#ifdef TECS
+#include "tecs.hpp"
+#endif
 #ifdef REFLECS
 #include "reflecs.hpp"
 #endif
@@ -119,11 +133,17 @@ void bench_create(int n) {
     #ifdef ENTT    
     bench_report_n("EnTT",    bench_create_empty_entt(n), "", N_ITERATIONS_CREATE);
     #endif
+    #ifdef TECS    
+    bench_report_n("tECS",    bench_create_empty_tecs(n), "", N_ITERATIONS_CREATE);
+    #endif
     #ifdef REFLECS 
     bench_report_n("Reflecs", bench_create_empty_reflecs(n), "", N_ITERATIONS_CREATE);
     #endif
     #ifdef ENTT    
     bench_report_n("EnTT",    bench_create_empty_entt_batch(n), "(batching)", N_ITERATIONS_CREATE);
+    #endif
+    #ifdef TECS    
+    bench_report_n("tECS",    bench_create_empty_tecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
     #endif
     #ifdef REFLECS 
     bench_report_n("Reflecs", bench_create_empty_reflecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
@@ -134,6 +154,9 @@ void bench_create(int n) {
     #ifdef ENTT
     bench_report_n("EnTT",    bench_create_1component_entt(n), "", N_ITERATIONS_CREATE);
     #endif
+    #ifdef REFLECS 
+    bench_report_n("tECS",    bench_create_1component_tecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
+    #endif
     #ifdef REFLECS
     bench_report_n("Reflecs", bench_create_1component_reflecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
     #endif
@@ -143,6 +166,9 @@ void bench_create(int n) {
     #ifdef ENTT
     bench_report_n("EnTT",    bench_create_2component_entt(n), "", N_ITERATIONS_CREATE);
     #endif
+    #ifdef REFLECS 
+    bench_report_n("tECS",    bench_create_2component_tecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
+    #endif
     #ifdef REFLECS
     bench_report_n("Reflecs", bench_create_2component_reflecs_batch(n), "(batching, family)", N_ITERATIONS_CREATE);
     #endif
@@ -151,6 +177,9 @@ void bench_create(int n) {
     bench_start("Entity creation, 3 component", n);
     #ifdef ENTT
     bench_report_n("EnTT",    bench_create_3component_entt(n), "", N_ITERATIONS_CREATE);
+    #endif
+    #ifdef REFLECS 
+    bench_report_n("tECS",    bench_create_3component_tecs_batch(n), "(batching)", N_ITERATIONS_CREATE);
     #endif
     #ifdef REFLECS
     bench_report_n("Reflecs", bench_create_3component_reflecs_batch(n), "(batching, family)", N_ITERATIONS_CREATE);
@@ -381,6 +410,9 @@ void bench_pathological(int n, int n_iter) {
     #ifdef ENTT
     bench_report("EnTT",    bench_iter_one_pathological_entt(n_iter, entity_list), "(view)");
     #endif
+    #ifdef TECS
+    bench_report("tECS",    bench_iter_one_pathological_tecs(n_iter, entity_list), "");
+    #endif
     #ifdef REFLECS
     bench_report("Reflecs", bench_iter_one_pathological_reflecs(n_iter, entity_list), "");
     #endif
@@ -390,6 +422,9 @@ void bench_pathological(int n, int n_iter) {
     #ifdef ENTT
     bench_report("EnTT",    bench_iter_two_pathological_entt_view(n_iter, entity_list), "(view)");
     bench_report("EnTT",    bench_iter_two_pathological_entt_group(n_iter, entity_list), "(group, owning)");
+    #endif
+    #ifdef TECS
+    bench_report("tECS",    bench_iter_two_pathological_tecs(n_iter, entity_list), "");
     #endif
     #ifdef REFLECS
     bench_report("Reflecs", bench_iter_two_pathological_reflecs(n_iter, entity_list), "");
@@ -401,6 +436,9 @@ void bench_pathological(int n, int n_iter) {
     bench_report("EnTT",    bench_iter_three_pathological_entt_view(n_iter, entity_list), "(view)");
     bench_report("EnTT",    bench_iter_three_pathological_entt_group(n_iter, entity_list), "(group, owning)");
     #endif
+    #ifdef TECS
+    bench_report("tECS",    bench_iter_three_pathological_tecs(n_iter, entity_list), "");
+    #endif
     #ifdef REFLECS
     bench_report("Reflecs", bench_iter_three_pathological_reflecs(n_iter, entity_list), "");
     #endif
@@ -411,21 +449,27 @@ void bench_pathological(int n, int n_iter) {
     bench_report("EnTT",    bench_iter_four_pathological_entt_view(n_iter, entity_list), "(view)");
     bench_report("EnTT",    bench_iter_four_pathological_entt_group(n_iter, entity_list), "(group, owning)");
     #endif
+    #ifdef TECS
+    bench_report("tECS",    bench_iter_four_pathological_tecs(n_iter, entity_list), "");
+    #endif
     #ifdef REFLECS
     bench_report("Reflecs", bench_iter_four_pathological_reflecs(n_iter, entity_list), "");
     #endif
     bench_stop();
 }
 
+#include <iostream>
+
 int main(int argc, char *argv[]) {
 
     bench_create(N_ENTITIES);
+	//
+    //bench_add(N_ENTITIES);
+	//
+    //bench_iterate(N_ENTITIES, N_ITERATIONS);
 
-    bench_add(N_ENTITIES);
-
-    bench_iterate(N_ENTITIES, N_ITERATIONS);
-
-    bench_pathological(N_ENTITIES, N_ITERATIONS);
+    //bench_pathological(N_ENTITIES, N_ITERATIONS);
 
     printf("\n");
+	std::cin.get();
 }
